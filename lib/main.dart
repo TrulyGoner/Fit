@@ -456,11 +456,11 @@ class DashboardScreen extends StatelessWidget {
         Row(
           children: [
             Container(
-              height: 40,
-              width: 40,
+              height: 56,
+              width: 56,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -478,7 +478,7 @@ class DashboardScreen extends StatelessWidget {
             Stack(
               children: [
                 const CircleAvatar(
-                  radius: 22,
+                  radius: 28,
                   backgroundColor: Colors.white,
                   child: Icon(
                     Icons.person,
@@ -486,8 +486,8 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: 2,
-                  top: 4,
+                  right: 6,
+                  top: 8,
                   child: Container(
                     height: 10,
                     width: 10,
@@ -734,28 +734,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 12),
+              const SizedBox(height: 59),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     onTap: widget.onBackToHome,
                     child: Container(
-                      height: 38,
-                      width: 38,
+                      height: 56,
+                      width: 56,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: const Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        size: 18,
+                        size: 22,
                         color: Colors.black87,
                       ),
                     ),
                   ),
                   const CircleAvatar(
-                    radius: 22,
+                    radius: 28,
                     backgroundColor: Colors.white,
                     child: Icon(
                       Icons.person,
@@ -826,7 +826,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ];
 
     return SizedBox(
-      height: 80,
+      height: 120,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: days.length,
@@ -842,8 +842,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOutQuad,
-              width: isActive ? 64 : 56,
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              width: 70,
+              height: 120,
+              padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 gradient: isActive
@@ -919,6 +920,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
         _TimelineItem(
           timeLabel: '10AM',
+          showDivider: true,
           card: _OngoingCard(
             title: 'Software Testing',
             time: '11:00 AM - 12:00 PM',
