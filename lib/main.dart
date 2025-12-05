@@ -44,7 +44,6 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                // Верхний блок с иллюстрацией
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(36),
@@ -60,7 +59,6 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Индикатор страниц (3 точки)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -187,7 +185,7 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-/// Общий shell с нижней навигацией (Artboard 2 и 3)
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -256,20 +254,16 @@ class _CurvedBottomNavBar extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final itemWidth = constraints.maxWidth / _itemCount;
-
-                // Перевод индекса [0..3] в Alignment.x [-1..1] + лёгкий сдвиг влево
                 final baseX =
                     (currentIndex + 0.5) / _itemCount * 2.0 - 1.0;
                 final targetX = baseX - 0.08;
 
                 return Stack(
                   children: [
-                    // Фон бара
                     Container(
                       color: Colors.white,
                     ),
 
-                    // Фиолетовая волна под активной иконкой
                     AnimatedAlign(
                       alignment: Alignment(targetX, 1.0),
                       duration: const Duration(milliseconds: 350),
@@ -286,7 +280,6 @@ class _CurvedBottomNavBar extends StatelessWidget {
                       ),
                     ),
 
-                    // Ряд иконок поверх
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -323,7 +316,6 @@ class _CurvedBottomNavBar extends StatelessWidget {
   }
 }
 
-/// Painter, который рисует плавную волну для активного таба.
 class _BottomWavePainter extends CustomPainter {
   _BottomWavePainter({required this.startColor, required this.endColor});
 
@@ -337,7 +329,6 @@ class _BottomWavePainter extends CustomPainter {
     final width = size.width;
     final height = size.height;
 
-    // Градиент для волны
     final rect = Rect.fromLTWH(0, height * 0.2, width, height * 0.8);
     paint.shader = LinearGradient(
       colors: [startColor, endColor],
@@ -347,10 +338,8 @@ class _BottomWavePainter extends CustomPainter {
 
     final path = Path();
 
-    // Начинаем снизу слева
     path.moveTo(0, height);
 
-    // Плавная небольшая «горка» прямо под активной иконкой
     path.quadraticBezierTo(
       width * 0.15,
       height - 10,
@@ -370,7 +359,6 @@ class _BottomWavePainter extends CustomPainter {
       height,
     );
 
-    // Закрываем контур по нижней части
     path.lineTo(width, height);
     path.lineTo(0, height);
     path.close();
@@ -632,7 +620,6 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildStatsGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Ширина экрана и padding брать НЕ нужно — карточки фиксированные как в макете
         const leftCardWidth = 162.0;
         const rightCardWidth = 161.0;
 
@@ -722,7 +709,7 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  int _selectedDayIndex = 1; // 5 число по умолчанию
+  int _selectedDayIndex = 1; 
 
   @override
   Widget build(BuildContext context) {
