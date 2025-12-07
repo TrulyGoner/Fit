@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
   runApp(const FitApp());
@@ -19,6 +20,10 @@ class FitApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFFF4F6FB),
         useMaterial3: true,
+         textTheme: ThemeData.light().textTheme.apply(
+          fontFamily: 'ProductSans',
+        ),
+        fontFamily: 'ProductSans',
       ),
       home: const WelcomeScreen(),
     );
@@ -32,18 +37,16 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 12, 7, 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(36),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(36),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(36),
@@ -153,14 +156,6 @@ class WelcomeScreen extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF5C6CFF)
-                                  .withOpacity(0.35),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
                         ),
                         child: const Center(
                           child: Text(
@@ -180,7 +175,6 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }
@@ -195,34 +189,48 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
-      body: _buildPage(),
+      backgroundColor: const Color(0xFFF4F6FB),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() => _currentIndex = index);
+        },
+        children: const [
+          DashboardScreen(),
+          CalendarScreen(),
+          ChatScreen(),
+          ProfileScreen(),
+        ],
+      ),
       bottomNavigationBar: _CurvedBottomNavBar(
         currentIndex: _currentIndex,
         onItemSelected: (index) {
           setState(() => _currentIndex = index);
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         },
       ),
     );
-  }
-
-  Widget _buildPage() {
-    switch (_currentIndex) {
-      case 0:
-        return const DashboardScreen();
-      case 1:
-        return CalendarScreen(
-          onBackToHome: () {
-            setState(() => _currentIndex = 0);
-          },
-        );
-      default:
-        return const SizedBox.shrink();
-    }
   }
 }
 
@@ -241,78 +249,96 @@ class _CurvedBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(30),
-          ),
-          child: SizedBox(
-            height: _barHeight,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth = constraints.maxWidth / _itemCount;
-                final baseX =
-                    (currentIndex + 0.5) / _itemCount * 2.0 - 1.0;
-                final targetX = baseX - 0.08;
-
-                return Stack(
-                  children: [
-                    Container(
-                      color: Colors.white,
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(30),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: _barHeight,
+          child: Stack(
+            children: [
+              // Волна под активной иконкой
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutQuad,
+                left: _calculateWavePosition(context),
+                bottom: 0,
+                child: SizedBox(
+                  width: _calculateWaveWidth(context),
+                  height: _barHeight * 0.5,
+                  child: CustomPaint(
+                    painter: _BottomWavePainter(
+                      startColor: const Color(0xFF8B5CFF),
+                      endColor: const Color(0xFF5C6CFF),
                     ),
+                  ),
+                ),
+              ),
 
-                    AnimatedAlign(
-                      alignment: Alignment(targetX, 1.0),
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeOutQuad,
-                      child: SizedBox(
-                        width: itemWidth * 0.9,
-                        height: _barHeight * 0.5,
-                        child: CustomPaint(
-                          painter: _BottomWavePainter(
-                            startColor: const Color(0xFF8B5CFF),
-                            endColor: const Color(0xFF5C6CFF),
-                          ),
-                        ),
+              // Ряд иконок поверх
+              Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: _BottomNavIcon(
+                        iconPath: 'assets/icons/Home.svg',
+                        isActive: currentIndex == 0,
+                        onTap: () => onItemSelected(0),
                       ),
                     ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _BottomNavIcon(
-                          icon: Icons.home_filled,
-                          isActive: currentIndex == 0,
-                          onTap: () => onItemSelected(0),
-                        ),
-                        _BottomNavIcon(
-                          icon: Icons.calendar_today_rounded,
-                          isActive: currentIndex == 1,
-                          onTap: () => onItemSelected(1),
-                        ),
-                        _BottomNavIcon(
-                          icon: Icons.chat_bubble_rounded,
-                          isActive: currentIndex == 2,
-                          onTap: () => onItemSelected(2),
-                        ),
-                        _BottomNavIcon(
-                          icon: Icons.person_rounded,
-                          isActive: currentIndex == 3,
-                          onTap: () => onItemSelected(3),
-                        ),
-                      ],
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: _BottomNavIcon(
+                        iconPath: 'assets/icons/calendar.svg',
+                        isActive: currentIndex == 1,
+                        onTap: () => onItemSelected(1),
+                      ),
                     ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: _BottomNavIcon(
+                        iconPath: 'assets/icons/messages.svg',
+                        isActive: currentIndex == 2,
+                        onTap: () => onItemSelected(2),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: _BottomNavIcon(
+                        iconPath: 'assets/icons/profile.svg',
+                        isActive: currentIndex == 3,
+                        onTap: () => onItemSelected(3),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  double _calculateWaveWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = screenWidth / _itemCount;
+    return itemWidth * 0.9;
+  }
+
+  double _calculateWavePosition(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = screenWidth / _itemCount;
+    final waveWidth = itemWidth * 0.9;
+    return currentIndex * itemWidth + (itemWidth - waveWidth) / 2;
   }
 }
 
@@ -377,38 +403,40 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
+      backgroundColor: const Color(0xFFF4F6FB),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+      ),
       body: SafeArea(
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 12, 7, 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(36),
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFFFFFFF),
-                  Color(0xFFF8F7FF),
-                ],
-              ),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFFFFFFF),
+                Color(0xFFF8F7FF),
+              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 60, 24, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTopBar(),
-                  const SizedBox(height: 24),
-                  _buildGreetingSection(),
-                  const SizedBox(height: 24),
-                  _buildCurrentTaskCard(),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: _buildBottomContent(),
-                  ),
-                ],
-              ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 60, 24, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTopBar(),
+                const SizedBox(height: 24),
+                _buildGreetingSection(),
+                const SizedBox(height: 24),
+                _buildCurrentTaskCard(),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: _buildBottomContent(),
+                ),
+              ],
             ),
           ),
         ),
@@ -700,9 +728,7 @@ class DashboardScreen extends StatelessWidget {
 
 /// Экран календаря / расписания (Artboard 3)
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key, required this.onBackToHome});
-
-  final VoidCallback onBackToHome;
+  const CalendarScreen({super.key});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -715,6 +741,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -725,20 +757,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: widget.onBackToHome,
-                    child: Container(
-                      height: 56,
-                      width: 56,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 22,
-                        color: Colors.black87,
-                      ),
+                  Container(
+                    height: 56,
+                    width: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      size: 22,
+                      color: Colors.black87,
                     ),
                   ),
                   const CircleAvatar(
@@ -895,6 +924,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Widget _buildTimeline() {
     return ListView(
+      padding: const EdgeInsets.only(bottom: 24, right: 8, left: 8),
       children: const [
         _TimelineItem(
           timeLabel: '9AM',
@@ -1137,27 +1167,91 @@ class _OngoingCard extends StatelessWidget {
 
 class _BottomNavIcon extends StatelessWidget {
   const _BottomNavIcon({
-    required this.icon,
+    required this.iconPath,
     this.isActive = false,
     this.onTap,
   });
 
-  final IconData icon;
+  final String iconPath;
   final bool isActive;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: Icon(
-          icon,
-          size: 24,
-          color:
+      child: AnimatedSlide(
+        offset: isActive ? const Offset(0, -0.18) : Offset.zero,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutQuad,
+        child: AnimatedScale(
+          scale: isActive ? 1.30 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          child: SvgPicture.asset(
+            iconPath,
+            width: 26,
+            height: 26,
+            colorFilter: ColorFilter.mode(
               isActive ? const Color(0xFF6C5CE7) : const Color(0xFFD1D5DB),
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Экран чата
+class ChatScreen extends StatelessWidget {
+  const ChatScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FB),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+      ),
+      body: const Center(
+        child: Text(
+          'Chat Screen',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Экран профиля
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FB),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+      ),
+      body: const Center(
+        child: Text(
+          'Profile Screen',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
