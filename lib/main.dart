@@ -471,23 +471,13 @@ class DashboardScreen extends StatelessWidget {
         ),
         Row(
           children: [
-            Container(
-              height: 56,
+            SvgPicture.asset(
+              'assets/icons/Navigation.svg',
               width: 56,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.search,
-                color: Color(0xFF4B5563),
+              height: 56,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF111827),
+                BlendMode.srcIn,
               ),
             ),
             const SizedBox(width: 16),
@@ -1186,13 +1176,13 @@ class _BottomNavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutQuad,
         child: AnimatedScale(
-          scale: isActive ? 1.30 : 1.0,
+          scale: isActive ? 1.05 : 1.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutBack,
           child: SvgPicture.asset(
             iconPath,
-            width: 26,
-            height: 26,
+            width: isActive ? 24 : 22,
+            height: isActive ? 24 : 22,
             colorFilter: ColorFilter.mode(
               isActive ? const Color(0xFF6C5CE7) : const Color(0xFFD1D5DB),
               BlendMode.srcIn,
